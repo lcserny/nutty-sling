@@ -10,5 +10,4 @@ public class GameScreen extends ScreenAdapter {
         this.game = game;
     }
 
-    
 }
