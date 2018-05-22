@@ -2,14 +2,13 @@ package net.cserny.game;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 
 public class TiledObjectBodyBuilder {
 
@@ -44,6 +43,33 @@ public class TiledObjectBodyBuilder {
 
             rectangle.dispose();
         }
+    }
+
+    public static void buildBirdBodies(TiledMap tiledMap, World world) {
+        MapObjects objects = tiledMap.getLayers().get("Physics_Birds").getObjects();
+        for (MapObject object : objects) {
+            CircleShape circle = getCircle((EllipseMapObject) object);
+
+            BodyDef def = new BodyDef();
+            def.type = BodyDef.BodyType.DynamicBody;
+
+            Body body = world.createBody(def);
+            Fixture fixture = body.createFixture(circle, 1);
+            fixture.setUserData(GameScreen.ENEMY);
+
+            circle.dispose();
+        }
+    }
+
+    private static CircleShape getCircle(EllipseMapObject ellipseObject) {
+        Ellipse ellipse = ellipseObject.getEllipse();
+        CircleShape circle = new CircleShape();
+        circle.setRadius(ellipse.width * HALF / PIXELS_PER_TILE);
+        circle.setPosition(new Vector2(
+                (ellipse.x + ellipse.width * HALF) / PIXELS_PER_TILE,
+                (ellipse.y + ellipse.height * HALF) / PIXELS_PER_TILE
+        ));
+        return circle;
     }
 
     private static PolygonShape getRectangle(RectangleMapObject rectangleObject) {
